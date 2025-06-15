@@ -22,7 +22,7 @@ pipeline {
             emailext (
                 subject: "Test Results: ${currentBuild.result ?: 'SUCCESS'}",
                 body: "View results: ${env.BUILD_URL}",
-                to: "rimshasajid2004@example.com"
+                to: "rimshasajid2004@gmail.com"
             )
         }
     }
