@@ -9,7 +9,7 @@ def test_add_task():
     options.add_argument("--disable-dev-shm-usage")
 
     driver = webdriver.Chrome(options=options)
-    driver.get("http://13.51.166.46:8081")
+    driver.get("http://56.228.41.169:8081")
 
     # Replace the following with actual logic
     task_input = driver.find_element("name", "task")
