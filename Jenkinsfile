@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        DOCKER_BUILDKIT = "1"  # Enable modern Docker build
+        DOCKER_BUILDKIT = "1"  
     }
     
     stages {
