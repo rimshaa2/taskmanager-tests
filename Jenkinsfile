@@ -6,18 +6,12 @@ pipeline {
                 git 'https://github.com/rimshaa2/taskmanager-tests.git'
             }
         }
-        stage('Build Test Image') {
-            steps {
-                script {
-                    docker.build("taskmanager-tests:latest", "--file Dockerfile .")
-                }
-            }
-        }
         stage('Run Tests') {
             steps {
                 script {
+                    docker.build("taskmanager-tests:latest", "--file Dockerfile .")
                     docker.image("taskmanager-tests:latest").inside {
-                        sh 'pytest tests/'  
+                        sh 'pytest tests/'
                     }
                 }
             }
@@ -27,8 +21,8 @@ pipeline {
         always {
             emailext (
                 subject: "Test Results: ${currentBuild.result ?: 'SUCCESS'}",
-                body: "Test results: ${env.BUILD_URL}",
-                to: "rimshasajid2004@example.com"  
+                body: "View results: ${env.BUILD_URL}",
+                to: "rimshasajid2004@example.com"
             )
         }
     }
