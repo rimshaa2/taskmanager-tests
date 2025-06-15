@@ -17,7 +17,7 @@ pipeline {
             steps {
                 script {
                     docker.image("taskmanager-tests:latest").inside {
-                        sh 'pytest tests/'  # Or `mvn test` for Java
+                        sh 'pytest tests/'  
                     }
                 }
             }
@@ -28,7 +28,7 @@ pipeline {
             emailext (
                 subject: "Test Results: ${currentBuild.result ?: 'SUCCESS'}",
                 body: "Test results: ${env.BUILD_URL}",
-                to: "collaborator@example.com"  # Replace with your email
+                to: "rimshasajid2004@example.com"  
             )
         }
     }
