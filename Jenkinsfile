@@ -2,13 +2,17 @@ pipeline {
     agent any
     
     environment {
-        DOCKER_BUILDKIT = "1"  
+        // Removed DOCKER_BUILDKIT as it's causing issues
+        TEST_IMAGE = "taskmanager-tests"
     }
     
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/rimshaa2/taskmanager-tests.git'
+                checkout([$class: 'GitSCM', 
+                         branches: [[name: '*/main']],
+                         userRemoteConfigs: [[url: 'https://github.com/rimshaa2/taskmanager-tests.git']]
+                        ])
             }
         }
         
@@ -16,9 +20,10 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh 'docker build --no-cache -t taskmanager-tests:latest .'
+                        // Simple docker build without BuildKit
+                        sh 'docker build -t ${TEST_IMAGE}:latest .'
                     } catch (Exception e) {
-                        error("Docker build failed: ${e.toString()}")
+                        error("Docker build failed: ${e.getMessage()}")
                     }
                 }
             }
@@ -28,11 +33,16 @@ pipeline {
             steps {
                 script {
                     try {
-                        docker.image('taskmanager-tests:latest').inside {
-                            sh 'pytest tests/ --verbose'
+                        // Run tests with proper directory structure
+                        docker.image("${TEST_IMAGE}:latest").inside {
+                            sh 'pytest tests/ --verbose --html=report.html'
                         }
+                        
+                        // Archive test results (optional)
+                        junit '**/test-reports/*.xml'
+                        archiveArtifacts '**/report.html'
                     } catch (Exception e) {
-                        error("Tests failed: ${e.toString()}")
+                        error("Tests failed: ${e.getMessage()}")
                     }
                 }
             }
@@ -41,8 +51,9 @@ pipeline {
     
     post {
         always {
-            // Removed email notification
             echo "Build completed with status: ${currentBuild.result}"
+            // Optional: Add clean up step
+            sh 'docker rmi -f ${TEST_IMAGE}:latest || true'
         }
     }
 }
