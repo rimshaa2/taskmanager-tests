@@ -1,23 +1,9 @@
-FROM python:3.10-slim
+FROM markhobson/maven-chrome:latest
 
-# Install Chrome and ChromeDriver
-RUN apt-get update && apt-get install -y \
-    chromium-driver \
-    chromium \
-    curl \
-    unzip \
-    && apt-get clean
-
-# Set environment variables for Selenium + Chrome
-ENV CHROME_BIN=/usr/bin/chromium
-ENV CHROMEDRIVER=/usr/bin/chromedriver
-
-# Set work directory and copy test files
 WORKDIR /app
 COPY . .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update && apt-get install -y python3 python3-pip
+RUN pip3 install -r requirements.txt
 
-# Default command to run tests
-CMD ["python", "tests/", "-v"]
+CMD ["pytest", "test/test_app.py"]
