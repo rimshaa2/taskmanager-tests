@@ -18,12 +18,7 @@ pipeline {
                     try {
                         sh 'docker build --no-cache -t taskmanager-tests:latest .'
                     } catch (Exception e) {
-                        emailext (
-                            subject: "FAILED: Docker Build - ${env.JOB_NAME}",
-                            body: "Build failed: ${e.toString()}\n\nCheck console: ${env.BUILD_URL}",
-                            to: 'rimshasajid2004@gmail.com'
-                        )
-                        error("Docker build failed")
+                        error("Docker build failed: ${e.toString()}")
                     }
                 }
             }
@@ -37,12 +32,7 @@ pipeline {
                             sh 'pytest tests/ --verbose'
                         }
                     } catch (Exception e) {
-                        emailext (
-                            subject: "FAILED: Tests - ${env.JOB_NAME}",
-                            body: "Tests failed: ${e.toString()}\n\nCheck console: ${env.BUILD_URL}",
-                            to: 'rimshasajid2004@gmail.com'
-                        )
-                        error("Tests failed")
+                        error("Tests failed: ${e.toString()}")
                     }
                 }
             }
@@ -51,12 +41,8 @@ pipeline {
     
     post {
         always {
-            emailext (
-                subject: "Result: ${currentBuild.result} - ${env.JOB_NAME}",
-                body: "Build: ${env.BUILD_URL}\n\nStatus: ${currentBuild.result}",
-                to: 'rimshasajid2004@gmail.com',
-                attachLog: true
-            )
+            // Removed email notification
+            echo "Build completed with status: ${currentBuild.result}"
         }
     }
 }
